@@ -1,17 +1,18 @@
 package main
 
 import (
-    "bufio"
     "fmt"
-    "os"
+    "log"
+    "github.com/ferneediaz/REPL-Caching/internal/pokeapi" // Corrected import path
 )
 
 func main() {
-    scanner := bufio.NewScanner(os.Stdin) // corrected assignment
-    fmt.Println("PLEASE ENTER SOME TEXT")
+    pokeapiClient := pokeapi.NewClient() // Corrected the typo here
 
-    scanner.Scan()
-    text := scanner.Text()
-
-    fmt.Println("echoing: ", text)
+    resp, err := pokeapiClient.ListLocationAreas()
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Println(resp)
+    //startRepl()
 }
