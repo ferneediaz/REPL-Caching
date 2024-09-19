@@ -5,7 +5,8 @@ import (
     "fmt"
     "os"
     "strings"
-    "errors" // Import the errors package
+    "errors"
+    "github.com/ferneediaz/REPL-Caching/internal/pokeapi" // Import the package
 )
 
 // Define the Error type if it's missing
@@ -50,6 +51,11 @@ func getCommands() map[string]cliCommand {
             name:        "help",
             description: "Prints the help menu",
             callback:    callbackHelp,
+        },
+        "map": {
+            name:        "map",
+            description: "Lists some location areas",
+            callback:    pokeapi.CallbackMap, // Call the exported function
         },
         "exit": {
             name:        "exit",
