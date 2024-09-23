@@ -1,8 +1,10 @@
 package main
 
+import "testing"
+
 func TestCleanInput(t *testing.T) {
 	cases := []struct {
-		input string
+		input    string
 		expected []string
 	}{
 		{
@@ -23,25 +25,20 @@ func TestCleanInput(t *testing.T) {
 		},
 		{
 			input:    "special!@#characters",
-			expected: []string{"special", "characters"},
+			expected: []string{"specialcharacters"},
 		},
-		}
 	}
 	for _, cs := range cases {
-		actual := cleanInput(cs.input){
-			if len(actual) != len(cs.expected){
-				t.Errorf("the length are not equal: %v vs %v"),
-					len(actual),
-					len(cs.expected).
-
-			}
+		actual := cleanInput(cs.input)
+		if len(actual) != len(cs.expected) {
+			t.Errorf("For input '%s': expected length %d, got %d", cs.input, len(cs.expected), len(actual))
 			continue
 		}
-		for i := range actual{
-			actualWord := actual[i]
-			expectedWord := cs.expected[i]
-			if actualWord != expectedWord {
-				t.Errorf("%v does not equal %v")
+
+		for i := range actual {
+			if actual[i] != cs.expected[i] {
+				t.Errorf("For input '%s': at index %d, expected '%s', got '%s'", cs.input, i, cs.expected[i], actual[i])
 			}
 		}
-	} 
+	}
+}

@@ -1,74 +1,92 @@
 package main
 
 import (
-    "bufio"
-    "fmt"
-    "os"
-    "strings"
-    "errors"
-    "github.com/ferneediaz/REPL-Caching/internal/pokeapi" // Import the package
+	"bufio"
+	"errors"
+	"fmt"
+	"os"
+	"strings"
+	"unicode"
+	// Import the package
 )
 
 // Define the Error type if it's missing
 var Error = errors.New("an error occurred")
 
-func startRepl() {
+func startRepl(cfg *config) {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Println("PLEASE ENTER SOME TEXT")
 
-    scanner.Scan()
-    text := scanner.Text()
-    cleaned := cleanInput(text)
-    if len(cleaned) == 0 {
-        continue
-    }
-    commandName := cleaned[0]
+		scanner.Scan()
+		text := scanner.Text()
+		cleaned := cleanInput(text)
+		if len(cleaned) == 0 {
+			continue
+		}
+		commandName := cleaned[0]
 
-    availableCommands := getCommands()
+		availableCommands := getCommands()
 
-    command , ok := availableCommands[commandName]
+		command, ok := availableCommands[commandName]
 
-    if !ok {
-        fmt.Println("invalid command")
-        continue
-    }
+		if !ok {
+			fmt.Println("invalid command")
+			continue
+		}
+		err := command.callback(cfg) // Added *config as argument
+		if err != nil {
+			fmt.Println(err)
+		}
 
-    command.callback()
+	}
 
-	} 
-    
 }
+
 type cliCommand struct {
-    name        string
-    description string
-    callback    func() error
-
+	name        string
+	description string
+	callback    func(cfg *config) error
 }
+
 func getCommands() map[string]cliCommand {
-    return map[string]cliCommand{
-        "help": {
-            name:        "help",
-            description: "Prints the help menu",
-            callback:    callbackHelp,
-        },
-        "map": {
-            name:        "map",
-            description: "Lists some location areas",
-            callback:    pokeapi.CallbackMap, // Call the exported function
-        },
-        "exit": {
-            name:        "exit",
-            description: "Turns off the Pokedex",
-            callback:    callbackExit,
-        },
-    }
+	return map[string]cliCommand{
+		"help": {
+			name:        "help",
+			description: "Prints the help menu",
+			callback:    callbackHelp,
+		},
+		"map": {
+			name:        "map",
+			description: "Lists the next location areas",
+			callback:    CallbackMap, // Change this line
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Lists the previous location areas",
+			callback:    CallbackMapB, // Change this line
+		},
+		"exit": {
+			name:        "exit",
+			description: "Turns off the Pokedex",
+			callback:    callbackExit,
+		},
+	}
 }
+
 func cleanInput(input string) []string {
-    lowered := strings.ToLower(input)
+	lowered := strings.ToLower(input)
+	words := strings.Fields(lowered)
 
-    words := strings.Fields(lowered)
-    
-    return words
+	// Remove special characters from each word
+	for i, word := range words {
+		words[i] = strings.Map(func(r rune) rune {
+			if unicode.IsLetter(r) || unicode.IsNumber(r) {
+				return r
+			}
+			return -1
+		}, word)
+	}
+
+	return words
 }
-

@@ -1,15 +1,19 @@
 package pokeapi
 
 import (
-	"fmt"    // Add fmt package for error formatting
+	"encoding/json"
+	"fmt" // Add fmt package for error formatting
 	"io"
 	"net/http"
-	"encoding/json"
 )
 
-func (c *Client) ListLocationAreas() (LocationAreasResp, error) {
+func (c *Client) ListLocationAreas(pageURL string) (LocationAreasResp, error) {
 	endpoint := "/location-area"
 	fullURL := baseURL + endpoint
+
+	if pageURL != "" {
+		fullURL = pageURL
+	}
 
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
